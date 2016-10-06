@@ -3,7 +3,35 @@ var myApp = angular.module('myApp', []);
 var toWords= function(num)
 {
 	num = parseInt(num);
-	console.log(num);
+	console.log("Integer Num =" + num);
+	var answerString = "";
+	while(num>0)
+	{
+		var numberWord = "";
+		var temp = num%10;
+		temp  = Math.floor(temp);
+		console.log("Temp ="+temp);
+		switch(temp)
+		{
+			case 1: numberWord = "one "; break;
+			case 2: numberWord += "two "; break;
+			case 3: numberWord += "three "; break;
+			case 4: numberWord += "four "; break;
+			case 5: numberWord += "five "; break;
+			case 6: numberWord += "six "; break;
+			case 7: numberWord += "seven "; break;
+			case 8: numberWord += "eight "; break;
+			case 9: numberWord += "nine "; break;
+			default: break;
+
+		}
+		num/=10;
+		answerString = numberWord + answerString;
+		console.log("NumberWord = "+numberWord);
+		console.log("answerString = "+answerString);		
+	}
+
+	
 }
 
 var splitNum = function(number)
@@ -25,6 +53,8 @@ var splitNum = function(number)
 	console.log(decNum);
 	return number;
 }
+
+//PUT IN FILTER TO TAKE OUT COMMAS
 
 myApp.filter('parseCheck',function()
 	{
@@ -49,6 +79,6 @@ myApp.filter('parseCheck',function()
 
 myApp.controller('MainCtrl', ['$scope', function ($scope) {
     
-    $scope.text = '-1.34';
+    $scope.text = '-003451.34';
     
 }]) 
