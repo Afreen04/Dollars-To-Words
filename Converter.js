@@ -199,7 +199,7 @@ var returnNum1 = function(numStr)
 		case "seven" : return 7; break;
 		case "eight": return 8; break;
 		case "nine" : return 9; break;
-		default: return 0;
+		default: return -1;
 	}
 }
 
@@ -225,7 +225,7 @@ var returnNum2 = function(numStr)
 		case "seventy": return 70;break;
 		case "eighty": return 80; break;
 		case "ninety": return 90; break;
-		default: return 0;
+		default: return -1;
 	}
 }
 
@@ -241,7 +241,7 @@ var returnNum3 = function(numStr)
 		case "seventy": return 70;break;
 		case "eighty": return 80; break;
 		case "ninety": return 90; break;
-		default: return 0;
+		default: return -1;
 	}
 }
 
@@ -257,27 +257,31 @@ var processNum = function(numStr)
 			hundredValue = returnWords(numStr[0]);
 			notHundredValue = returnWords(numStr[1]);
 			console.log("Hundreds part"+" "+ hundredValue[0]+" "+returnNum1(hundredValue[0]));
-			outputNum += returnNum1(hundredValue[0]) * 100;
+			if(returnNum1(hundredValue[0]) !=-1)
+				outputNum += returnNum1(hundredValue[0]) * 100;
+			else
+				 return "Hundreds value is wrong";
 		}
 	else
 	{
 		notHundredValue = returnWords(numStr);
 	}
-			//console.log("notHundredValue[0] "+ notHundredValue[0]);
-			//console.log("notHundredValue[1] "+ notHundredValue[1].length);
+	if(notHundredValue)
+	{
+			
 			if(notHundredValue[1].length > 0)
 			{
-				if(returnNum1(notHundredValue[0])!= 0 && returnNum2(notHundredValue[0])!= 0)
+				if(returnNum1(notHundredValue[0])!= -1 && returnNum2(notHundredValue[0])!= -1)
 				{
 					console.log("Error case");
 					return "Bad Input9";
 				}
 				else 
 				{
-					if(returnNum3(notHundredValue[0]))     //twenty
+					if(returnNum3(notHundredValue[0])!=-1)     //twenty
 					{
 						outputNum+=returnNum3(notHundredValue[0]);
-						if(returnNum1(notHundredValue[1]))    //one
+						if(returnNum1(notHundredValue[1])!=-1)    //one
 							{
 								outputNum+=returnNum1(notHundredValue[1]);
 								console.log("outputNum1" + outputNum);
@@ -295,13 +299,13 @@ var processNum = function(numStr)
 					}
 				}
 			}
-			if(returnNum1(notHundredValue[0])) //one, two case
+			if(returnNum1(notHundredValue[0])!=-1) //one, two case
 			{
 				outputNum+=returnNum1(notHundredValue[0]);
 				console.log("outputNum2" + outputNum);
 				return outputNum;
 			}
-			else if(returnNum2(notHundredValue[0]))   // the teens case
+			else if(returnNum2(notHundredValue[0])!=-1)   // the teens case
 			{
 				outputNum+=returnNum2(notHundredValue[0]);
 				console.log("outputNum3" + outputNum);
@@ -311,7 +315,8 @@ var processNum = function(numStr)
 				return "Bad Input13";
 			console.log("Not Hundreds part "+ notHundredValue);	
 		
-	
+	}
+	return outputNum;
 }
 
 var parseCents = function(numStr,cents)
@@ -337,13 +342,15 @@ var parseCents = function(numStr,cents)
 		}
 	var tempNum2 = tempNum[0];
 	tempNum2 = returnWords(tempNum2);
-	console.log("cents words ",tempNum[0]);
+	console.log("cents words",tempNum[0]);
 	if(tempNum2[2])
 	{
+		console.log("Bad Input 18");
 		return "Bad Input 18";
 	}
 	else
-		{outputNum = processNum(tempNum[0]);
+		{ 
+			outputNum = processNum(tempNum[0]);
 			return outputNum;
 		}
 	return output;
@@ -383,16 +390,20 @@ var parseDollars = function(numStr,dollars)
 			millionString = returnWords(millionString[0]);
 			//millionString=millionString[0];
 			console.log("millionString after return words"+ millionString);
-			if(millionString[0] != "one")   // here add cents condition also
+			if(millionString[0] == "zero")
+				outputNum+=0;
+			else if(millionString[0] == "one")   // here add cents condition also
 				{
-					//alert("Out of range");
-					return 2000000;
-				}
-			else
-				{
+
 				outputNum += 1000000;
 				console.log("one million case detected");
 				return outputNum;
+					//alert("Out of range");
+				
+				}
+			else
+				{
+						return 2000000;
 				}
 		}
 	console.log("tempNum after million "+ tempNum);	
@@ -416,8 +427,9 @@ var parseDollars = function(numStr,dollars)
 	if(tempNum.length > 1)
 	{
 		console.log("It has a hundreds part left");
-		console.log("onespart " +tempNum);
+		console.log("onespart" +tempNum);
 		var onesNum = processNum(tempNum);
+		console.log("onesNum " +onesNum);
 		if(typeof onesNum === 'string' || onesNum instanceof String)
 		{
 			return "Bad Input 17";
@@ -440,9 +452,9 @@ var splitString = function(numStr)
 	var dollarMatch = numStr.match(/dollars?/);
 	var centMatch = numStr.match(/cents?/);
 	if(!dollarMatch)		//Should have dollar value
-		return "Bad Input5";		
+		return "Does not have a dollar part";		
 	if(!centMatch)				//Should have cents value
-		return "Bad Input6";
+		return "Does not have a cents part";
 	var output = "";	
 
 	//Minus condition here
@@ -453,7 +465,7 @@ var splitString = function(numStr)
 		if(minusMatch.length == 1)
 			output = "-";
 		else if(minusMatch.length>1)   //minus minus
-			return "Bad Input7"; 
+			return "Multiple minus"; 
 		numStr = numStr.split("minus");
 		numStr = numStr[1];				
 	}
@@ -468,7 +480,7 @@ var splitString = function(numStr)
 	//Hold the output in an float
 	//If it is a string of any sort, it means there is problem
 	var outputNum = 0;
-
+	var dollarNum=0;
 	//DOLLAR PART
 	if(dollarMatch[0].length > 6)
 		outputNum=parseDollars(dollarsString, true);
@@ -479,7 +491,9 @@ var splitString = function(numStr)
 	if(outputNum > 1000000.00)
 		return "Out of range";
 	else
-		output+=outputNum.toString();
+		{output+=outputNum.toString();
+		 dollarNum = outputNum;
+		}
 	output+=".";
 
 	//DO not process cents part if above result is string
@@ -490,10 +504,13 @@ var splitString = function(numStr)
 	else
 		outputNum = parseCents(centsString,false);
 
+	console.log("Cents outputNum " + outputNum);
 	if (typeof outputNum === 'string' || outputNum instanceof String)
 		return "Check Cents part";
 	else
 	{
+		if(dollarNum == 1000000 && outputNum > 0)
+			return "Out of range";
 		if(outputNum < 10)
 			output+="0"+outputNum.toString();
 		else
@@ -520,8 +537,6 @@ myApp.filter('parseCheck',function()
 				return "Too many spaces";
 			else if(match2 && match2[0].length == input.length && andMatch.length == 1)   //Check if words with single 'and'
 				{
-				//return input;
-				console.log("2nd Case match");
 				return splitString(input);
 				}
 			else
