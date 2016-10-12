@@ -329,17 +329,22 @@ var parseCents = function(numStr,cents)
 	else
 		{
 			tempNum = numStr.split("cent");
-			var oneMatch = tempNum[0].match(/ *one */);		
-				console.log("oneMatch " + oneMatch);
+			var oneMatch = tempNum[0].match(/one /);		
+				//console.log("oneMatch" + oneMatch[0]+tempNum[0]+ tempNum[0].length);
 			if(oneMatch != null)
 				if(tempNum[0].length == oneMatch[0].length)
-					return 1;
+					{
+						console.log("One match");
+						return 1;
+					}
 			else
 				{
 					console.log("It should be cent(s)");
 					return "It should be cent(s)";
 				}
 		}
+		if(tempNum[0].length == 0)
+			return "Empty Cents part";
 	var tempNum2 = tempNum[0];
 	tempNum2 = returnWords(tempNum2);
 	console.log("cents words",tempNum[0]);
@@ -374,6 +379,9 @@ var parseDollars = function(numStr,dollars)
 				else           //Does not work?
 					return "Should be dollar(s)";
 			}
+	console.log("empty tempNum[0]"+tempNum[0].length+",");		
+		if(tempNum[0].length == 0)
+			return "Empty Dollar part";
 	var millionMatch = tempNum[0].match(/millions?/);
 	var thousandMatch = tempNum[0].match(/thousands?/);
 	var oneMatch2 = tempNum[0].match(/ *one */);
@@ -403,7 +411,10 @@ var parseDollars = function(numStr,dollars)
 				}
 			else
 				{
-						return 2000000;
+					if(returnNum1( millionString[0]) == -1)
+							return "Bad input 21";
+						
+					return 2000000;
 				}
 		}
 	console.log("tempNum after million "+ tempNum);	
@@ -473,23 +484,35 @@ var splitString = function(numStr)
 	numStr = numStr.split(" and ");
 	var dollarsString = numStr[0];
 	var centsString = numStr[1];
-	console.log("dollarsString " + dollarsString);
-	console.log("centsString "+ centsString);
-	console.log("dollarMatch "+ dollarMatch[0].length);
+	//console.log("dollarsString " + dollarsString);
+	//console.log("centsString "+ centsString);
+	//console.log("dollarMatch "+ dollarMatch[0].length);
 	
 	//Hold the output in an float
 	//If it is a string of any sort, it means there is problem
 	var outputNum = 0;
 	var dollarNum=0;
+	var isDollars= true;
+
 	//DOLLAR PART
 	if(dollarMatch[0].length > 6)
 		outputNum=parseDollars(dollarsString, true);
 	else
-		outputNum=parseDollars(dollarsString, false);
+		{outputNum=parseDollars(dollarsString, false);
+			isDollars = false;
+		}
 	if (typeof outputNum === 'string' || outputNum instanceof String)
 		return "Check Dollar part";
 	if(outputNum > 1000000.00)
 		return "Out of range";
+	else if(isDollars && outputNum==1)
+	{
+		return "Should be dollar";
+	}
+	else if(!isDollars && outputNum!=1)
+	{
+		return "Should be dollar(s)";
+	}
 	else
 		{output+=outputNum.toString();
 		 dollarNum = outputNum;
@@ -499,14 +522,30 @@ var splitString = function(numStr)
 	//DO not process cents part if above result is string
 	//CENTS PART
 
+	outputNum = 0;
+	var isCents = true;
+
 	if(centMatch[0].length > 4)
-		outputNum = parseCents(centsString,true);
+		{outputNum = parseCents(centsString,true);
+			isCents = true;
+		}
 	else
-		outputNum = parseCents(centsString,false);
+		{console.log("This is cent case");
+			outputNum = parseCents(centsString,false);
+			isCents = false;
+		}
 
 	console.log("Cents outputNum " + outputNum);
 	if (typeof outputNum === 'string' || outputNum instanceof String)
 		return "Check Cents part";
+	else if(!isCents && outputNum!=1)
+	{
+		return "Should be cent(s)";
+	}
+	else if(isCents && outputNum == 1)
+	{
+		return "Should be cent";
+	}
 	else
 	{
 		if(dollarNum == 1000000 && outputNum > 0)
